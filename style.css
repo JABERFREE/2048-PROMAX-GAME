@@ -1,0 +1,235 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #ff7e00, #ffb347);
+    color: #4a2c00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    direction: rtl;
+    padding: 10px;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    background: linear-gradient(145deg, #fff3cd, #ffe082); /* لون أصفر دافئ ومتناسق مع تصميم الـ 3D */
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(150, 60, 0, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.8);
+    margin: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 900;
+    color: #d35400;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.pro-badge {
+    background: linear-gradient(145deg, #e74c3c, #c0392b);
+    color: white;
+    font-size: 14px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    vertical-align: middle;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.scores-container {
+    display: flex;
+    gap: 8px;
+}
+
+.score-box {
+    background: linear-gradient(145deg, #f39c12, #d35400);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 65px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.4);
+}
+
+.score-box span {
+    display: block;
+    font-size: 16px;
+}
+
+/* شريط التحكم والعبارة التعريفية */
+.controls-bar {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.btn {
+    background: linear-gradient(145deg, #ff5252, #c0392b);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;
+    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3), inset 0 1px 2px rgba(255,255,255,0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 5px rgba(192, 57, 43, 0.3);
+}
+
+.btn:hover {
+    background: linear-gradient(145deg, #ff6b6b, #d63031);
+}
+
+/* تنسيق العبارة التعريفية مكان زر الصوت */
+.game-tagline {
+    font-size: 13px;
+    font-weight: bold;
+    color: #b5470a;
+    background: rgba(243, 156, 18, 0.15);
+    padding: 8px 10px;
+    border-radius: 8px;
+    flex-grow: 1;
+    text-align: center;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* شبكة اللعب بتصميم غائر للخلف لتعطي عمقاً للمربعات البارزة */
+.grid-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #b5470a;
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.35), 0 4px 8px rgba(255, 255, 255, 0.2);
+}
+
+.grid-row {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+}
+
+.grid-cell {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tile-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+}
+
+/* المربعات بتصميم ثلاثي الأبعاد بارز جداً وكأنها مجسمة (3D Raised Effect) */
+.tile {
+    position: absolute;
+    width: 22.5%;
+    height: 22.5%;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(1.2rem + 1vw);
+    font-weight: bold;
+    transition: all 0.12s ease-in-out;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3), inset 0 4px 6px rgba(255, 255, 255, 0.6), inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.tile-2 { background: linear-gradient(145deg, #fff5d6, #ffeaa7); color: #b71540; }
+.tile-4 { background: linear-gradient(145deg, #ffd0bc, #fab1a0); color: #b71540; }
+.tile-8 { background: linear-gradient(145deg, #ffa8a8, #ff7675); color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-16 { background: linear-gradient(145deg, #ff6b6b, #d63031); color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-32 { background: linear-gradient(145deg, #ff8c53, #e84118); color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-64 { background: linear-gradient(145deg, #c0392b, #c23616); color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-128 { background: linear-gradient(145deg, #fbc531, #e1b12c); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-256 { background: linear-gradient(145deg, #f39c12, #d35400); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-512 { background: linear-gradient(145deg, #e67e22, #b5470a); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-1024 { background: linear-gradient(145deg, #d35400, #a04000); color: #fff; font-size: calc(1rem + 0.5vw); text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.tile-2048 { background: linear-gradient(145deg, #9b59b6, #6c3483); color: #fff; font-size: calc(1rem + 0.5vw); text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+.game-message {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(211, 84, 0, 0.9);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 26px;
+    font-weight: bold;
+    border-radius: 12px;
+    z-index: 10;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.game-message.active {
+    display: flex;
+}
+
+.game-message button {
+    margin-top: 15px;
+    background: white;
+    color: #d35400;
+}
+/* تنسيق زر تبديل اللغة الصغير */
+.lang-toggle-btn {
+    background: linear-gradient(145deg, #3498db, #2980b9) !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    min-width: 45px;
+    box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3), inset 0 1px 2px rgba(255,255,255,0.4) !important;
+}
+
+.lang-toggle-btn:hover {
+    background: linear-gradient(145deg, #5dade2, #3498db) !important;
+}
+.tile {
+    transition: transform 0.15s ease-in-out; /* سرعة ونعومة الانزلاق */
+    will-change: transform;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.tile-merged {
+    animation: pop 0.2s ease-in-out;
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 Pro - لعبة الأرقام الاحترافية</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- إضافة CrazyGames SDK الرسمية لتجنب رفض اللعبة -->
+    <script src="https://sdk.crazygames.com/crazygames-sdk-v2.js"></script>
+</head>
+<body>
+    <div class="game-container">
+        <!-- رأس اللعبة (العنوان والنتيجة) -->
+        <div class="header">
+            <h1 class="title">2048 <span class="pro-badge">PRO</span></h1>
+            <div class="scores-container">
+                <div class="score-box"><span data-i18n="score">النتيجة</span> <span id="score">0</span></div>
+                <div class="score-box"><span data-i18n="bestScore">أعلى نتيجة</span> <span id="best-score">0</span></div>
+            </div>
+        </div>
+
+        <!-- أزرار التحكم والعبارة التعريفية وزر تبديل اللغة -->
+        <div class="controls-bar">
+            <button id="restart-btn" class="btn" data-i18n="newGame">لعبة جديدة</button>
+            <button id="undo-btn" class="btn" data-i18n="undo">تراجع</button>
+            <button id="lang-btn" class="btn lang-toggle-btn">EN</button>
+            <div class="game-tagline" data-i18n="tagline">اجمع الارقام ووصل الى المربع 2048 !</div>
+        </div>
+
+        <!-- شبكة اللعب 4×4 -->
+        <div class="grid-container" id="grid-container">
+            <div class="grid-row">
+                <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+            </div>
+
+            <!-- طبقة المربعات المتحركة -->
+            <div class="tile-container" id="tile-container"></div>
+        </div>
+
+        <!-- رسالة نهاية اللعبة -->
+        <div class="game-message" id="game-message">
+            <p id="message-text"></p>
+            <button class="btn" id="retry-btn" data-i18n="tryAgain">حاول مجدداً</button>
+        </div>
+    </div>
+
+    <!-- صوت الفشل المُدمج (يعمل مباشرة دون الحاجة لملفات خارجية) -->
+    <audio id="fail-sound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..."></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
