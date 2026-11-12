@@ -7,6 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 let board = [];
 let score = 0;
 let bestScore = localStorage.getItem('bestScore') || 0;
@@ -129,7 +130,6 @@ function watchRewardedAd() {
             },
             onAdError: (error) => {
                 console.log("خطأ في تشغيل الإعلان:", error);
-                // تراجع مباشر في حال حدوث خطأ برتقالي في تحميل الإعلان
                 executeUndoAction();
                 isMuted = false;
             },
@@ -138,7 +138,6 @@ function watchRewardedAd() {
             }
         });
     } else {
-        // محاكاة محلية في حال التشغيل خارج المنصة
         executeUndoAction();
     }
 }
@@ -205,7 +204,7 @@ function updateView() {
                 tile.classList.add('tile', `tile-${board[r][c]}`);
                 tile.textContent = board[r][c];
                 
-                // تصحيح إحداثيات عرض المربعات بنسب مئوية صحيحة
+                // إحداثيات عرض المربعات بنسب مئوية صحيحة
                 tile.style.top = `${r * 25}%`;
                 tile.style.left = `${c * 25}%`;
                 
@@ -242,7 +241,6 @@ function handleMove(direction) {
             messageText.textContent = translations[currentLang].gameOver;
             gameMessage.classList.add('active');
             
-            // إعلام المنصة بانتهاء اللعب (SDK v3)
             if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
                 window.CrazyGames.SDK.game.gameplayStop();
             }
