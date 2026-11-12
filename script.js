@@ -1,3 +1,13 @@
+// تهيئة CrazyGames SDK v3 بشكل آمن لتجنب الأخطاء محلياً
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.CrazyGames && window.CrazyGames.SDK) {
+        window.CrazyGames.SDK.init().then(() => {
+            console.log("CrazyGames SDK initialized successfully");
+        }).catch((e) => {
+            console.log("SDK init error (normal during local testing):", e);
+        });
+    }
+});
 let board = [];
 let score = 0;
 let bestScore = localStorage.getItem('bestScore') || 0;
@@ -11,7 +21,7 @@ const translations = {
         score: "النتيجة",
         bestScore: "أعلى نتيجة",
         newGame: "لعبة جديدة",
-        undo: "تراجع",
+        undo: "تراجع (إعلان)",
         tagline: "اجمع الارقام ووصل الى المربع 2048 !",
         gameOver: "انتهت اللعبة!",
         tryAgain: "حاول مجدداً",
@@ -21,7 +31,7 @@ const translations = {
         score: "Score",
         bestScore: "Best",
         newGame: "New Game",
-        undo: "Undo",
+        undo: "Undo (Ad)",
         tagline: "Join the numbers and get to the 2048 tile!",
         gameOver: "Game Over!",
         tryAgain: "Try Again",
@@ -83,12 +93,66 @@ function playBeep(frequency, duration) {
 }
 
 // ربط الأزرار
-document.getElementById('restart-btn').addEventListener('click', restartGame);
-document.getElementById('retry-btn').addEventListener('click', restartGame);
+document.getElementById('restart-btn').addEventListener('click', () => {
+    restartGame();
+});
+
+document.getElementById('retry-btn').addEventListener('click', () => {
+    // تشغيل إعلان بيني عند الخسارة وإعادة المحاولة (SDK v3)
+    if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad) {
+        window.CrazyGames.SDK.ad.requestAd("midgame", {
+            adFinished: () => restartGame(),
+            adError: () => restartGame(),
+            adStarted: () => { isMuted = true; }
+        });
+    } else {
+        restartGame();
+    }
+});
 
 const undoBtn = document.getElementById('undo-btn');
 if (undoBtn) {
-    undoBtn.addEventListener('click', undoMove);
+    undoBtn.addEventListener('click', () => {
+        watchRewardedAd();
+    });
+}
+
+// دالة طلب إعلان المكافأة للتراجع عبر CrazyGames SDK v3
+function watchRewardedAd() {
+    if (history.length === 0) return; // لا يوجد تراجع متاح أصلاً
+
+    if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad) {
+        window.CrazyGames.SDK.ad.requestRewardedAd({
+            onRewarded: () => {
+                console.log("تمت مشاهدة الإعلان بنجاح، تنفيذ التراجع.");
+                executeUndoAction();
+                isMuted = false;
+            },
+            onAdError: (error) => {
+                console.log("خطأ في تشغيل الإعلان:", error);
+                // تراجع مباشر في حال حدوث خطأ برتقالي في تحميل الإعلان
+                executeUndoAction();
+                isMuted = false;
+            },
+            onAdStarted: () => {
+                isMuted = true;
+            }
+        });
+    } else {
+        // محاكاة محلية في حال التشغيل خارج المنصة
+        executeUndoAction();
+    }
+}
+
+function executeUndoAction() {
+    if (history.length > 0) {
+        let previousState = history.pop();
+        board = previousState.board;
+        score = previousState.score;
+        gameMessage.classList.remove('active');
+        updateView();
+        playBeep(200, 0.05);
+    }
 }
 
 function initGame() {
@@ -104,7 +168,7 @@ function initGame() {
     bestScoreDisplay.textContent = bestScore;
     gameMessage.classList.remove('active');
     
-    // إعلام CrazyGames SDK ببدء جولة اللعب بالطريقة الصحيحة
+    // إعلام CrazyGames SDK ببدء جولة اللعب (SDK v3)
     if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
         window.CrazyGames.SDK.game.gameplayStart();
     }
@@ -116,17 +180,6 @@ function initGame() {
 
 function restartGame() {
     initGame();
-}
-
-function undoMove() {
-    if (history.length > 0) {
-        let previousState = history.pop();
-        board = previousState.board;
-        score = previousState.score;
-        gameMessage.classList.remove('active');
-        updateView();
-        playBeep(200, 0.05);
-    }
 }
 
 function addNewTile() {
@@ -153,8 +206,9 @@ function updateView() {
                 tile.classList.add('tile', `tile-${board[r][c]}`);
                 tile.textContent = board[r][c];
                 
-                tile.style.top = `${r * 25.75}%`;
-                tile.style.left = `${c * 25.75}%`;
+                // تصحيح إحداثيات عرض المربعات بنسب مئوية صحيحة
+                tile.style.top = `${r * 25}%`;
+                tile.style.left = `${c * 25}%`;
                 
                 tileContainer.appendChild(tile);
             }
@@ -188,6 +242,11 @@ function handleMove(direction) {
         if (checkGameOver()) {
             messageText.textContent = translations[currentLang].gameOver;
             gameMessage.classList.add('active');
+            
+            // إعلام المنصة بانتهاء اللعب (SDK v3)
+            if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
+                window.CrazyGames.SDK.game.gameplayStop();
+            }
         }
     }
 }
@@ -319,25 +378,9 @@ function checkGameOver() {
             if (r < 3 && board[r][c] === board[r + 1][c]) return false;
         }
     }
-
-    // إيقاف اللعب وتشغيل الإعلان بالطريقة الصحيحة لإصدار SDK v2
-    if (window.CrazyGames && window.CrazyGames.SDK) {
-        if (window.CrazyGames.SDK.game) {
-            window.CrazyGames.SDK.game.gameplayStop();
-        }
-        if (window.CrazyGames.SDK.ad) {
-            window.CrazyGames.SDK.ad.requestAd("midgame", {
-                adFinished: () => { console.log("Ad finished"); },
-                adError: () => { console.log("Ad error"); },
-                adStarted: () => { /* كتم الصوت هنا إن وجد */ }
-            });
-        }
-    }
-
     return true;
 }
 
 // تهيئة النصوص واللعبة عند التحميل
 updateTexts();
 initGame();
-document.getElementById('fail-sound').play().catch(e => console.log(e));
