@@ -1,15 +1,19 @@
-// حماية تهيئة SDK لتجنب توقف اللعبة خارج منصة CrazyGames
+// الحماية الفورية للـ SDK لضمان عدم توقف اللعبة خارج منصة CrazyGames
+const isCrazyGamesEnv = () => {
+    return window.CrazyGames && window.CrazyGames.SDK;
+};
+
 window.addEventListener('DOMContentLoaded', () => {
     try {
-        if (window.CrazyGames && window.CrazyGames.SDK) {
+        if (isCrazyGamesEnv() && window.CrazyGames.SDK.init) {
             window.CrazyGames.SDK.init().then(() => {
                 console.log("CrazyGames SDK initialized successfully");
             }).catch((e) => {
-                console.log("SDK init error:", e);
+                console.log("SDK init skipped:", e);
             });
         }
     } catch (err) {
-        console.log("SDK not loaded, running standard mode.");
+        console.log("Running in standard web mode.");
     }
 });
 
@@ -20,7 +24,6 @@ let history = [];
 let isMuted = false;
 let currentLang = localStorage.getItem('lang') || 'ar';
 
-// القاموس اللغوي الشامل
 const translations = {
     ar: {
         score: "النتيجة",
@@ -50,7 +53,6 @@ const tileContainer = document.getElementById('tile-container');
 const gameMessage = document.getElementById('game-message');
 const messageText = document.getElementById('message-text');
 
-// تطبيق الترجمة على الواجهة
 function updateTexts() {
     document.documentElement.lang = currentLang;
     document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
@@ -68,7 +70,6 @@ function updateTexts() {
     }
 }
 
-// تبديل اللغة عند النقر
 const langBtnEl = document.getElementById('lang-btn');
 if (langBtnEl) {
     langBtnEl.addEventListener('click', () => {
@@ -78,7 +79,6 @@ if (langBtnEl) {
     });
 }
 
-// مولد أصوات رقمي داخلي
 function playBeep(frequency, duration) {
     if (isMuted) return;
     try {
@@ -100,7 +100,6 @@ function playBeep(frequency, duration) {
     } catch (e) {}
 }
 
-// ربط الأزرار
 const restartBtn = document.getElementById('restart-btn');
 if (restartBtn) {
     restartBtn.addEventListener('click', () => {
@@ -111,7 +110,7 @@ if (restartBtn) {
 const retryBtn = document.getElementById('retry-btn');
 if (retryBtn) {
     retryBtn.addEventListener('click', () => {
-        if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad) {
+        if (isCrazyGamesEnv() && window.CrazyGames.SDK.ad) {
             try {
                 window.CrazyGames.SDK.ad.requestAd("midgame", {
                     adFinished: () => restartGame(),
@@ -134,11 +133,10 @@ if (undoBtn) {
     });
 }
 
-// دالة طلب إعلان المكافأة للتراجع
 function watchRewardedAd() {
     if (history.length === 0) return;
 
-    if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad) {
+    if (isCrazyGamesEnv() && window.CrazyGames.SDK.ad) {
         try {
             window.CrazyGames.SDK.ad.requestRewardedAd({
                 onRewarded: () => {
@@ -185,7 +183,7 @@ function initGame() {
     if (bestScoreDisplay) bestScoreDisplay.textContent = bestScore;
     if (gameMessage) gameMessage.classList.remove('active');
     
-    if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
+    if (isCrazyGamesEnv() && window.CrazyGames.SDK.game) {
         try {
             window.CrazyGames.SDK.game.gameplayStart();
         } catch (e) {}
@@ -261,7 +259,7 @@ function handleMove(direction) {
             if (messageText) messageText.textContent = translations[currentLang].gameOver;
             if (gameMessage) gameMessage.classList.add('active');
             
-            if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
+            if (isCrazyGamesEnv() && window.CrazyGames.SDK.game) {
                 try {
                     window.CrazyGames.SDK.game.gameplayStop();
                 } catch (e) {}
@@ -400,6 +398,5 @@ function checkGameOver() {
     return true;
 }
 
-// تهيئة النصوص واللعبة عند التحميل
 updateTexts();
 initGame();
