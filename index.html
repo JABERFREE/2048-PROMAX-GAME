@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2048 Pro - لعبة الأرقام الاحترافية</title>
     <link rel="stylesheet" href="style.css">
-    <meta name="google-adsense-account" content="ca-pub-8326203252240169">
-     crossorigin="anonymous"></script>
- <meta name="google-site-verification" content="ldHqQqsBJ_FL6eSmD57Zn6J29r5HWX-374bbj4X9ePo" />   
-   
-</head>
     
+    <!-- تحديث إلى CrazyGames SDK v3 الرسمية -->
+    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+</head>
 <body>
     <div class="game-container">
-        <!-- رأس اللعبة (العنوان والنتيجة) -->
+        <!-- رأس اللعبة -->
         <div class="header">
             <h1 class="title">2048 <span class="pro-badge">PRO</span></h1>
             <div class="scores-container">
@@ -22,10 +20,11 @@
             </div>
         </div>
 
-        <!-- أزرار التحكم والعبارة التعريفية وزر تبديل اللغة -->
+        <!-- أزرار التحكم -->
         <div class="controls-bar">
             <button id="restart-btn" class="btn" data-i18n="newGame">لعبة جديدة</button>
-            <button id="undo-btn" class="btn" data-i18n="undo">تراجع</button>
+            <!-- زر التراجع مرتبط بإعلان المكافأة -->
+            <button id="undo-btn" class="btn" data-i18n="undo">تراجع (إعلان)</button>
             <button id="lang-btn" class="btn lang-toggle-btn">EN</button>
             <div class="game-tagline" data-i18n="tagline">اجمع الارقام ووصل الى المربع 2048 !</div>
         </div>
@@ -50,14 +49,11 @@
         </div>
 
         <!-- رسالة نهاية اللعبة -->
-        <div class="game-message" id="game-message">
+        <div class="message-container" id="game-message">
             <p id="message-text"></p>
             <button class="btn" id="retry-btn" data-i18n="tryAgain">حاول مجدداً</button>
         </div>
     </div>
-
-    <!-- صوت الفشل المُدمج (يعمل مباشرة دون الحاجة لملفات خارجية) -->
-    <audio id="fail-sound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..."></audio>
 
     <script src="script.js"></script>
 </body>
