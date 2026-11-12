@@ -7,7 +7,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
 let board = [];
 let score = 0;
 let bestScore = localStorage.getItem('bestScore') || 0;
@@ -98,6 +97,7 @@ document.getElementById('restart-btn').addEventListener('click', () => {
 });
 
 document.getElementById('retry-btn').addEventListener('click', () => {
+    // تشغيل إعلان بيني عند الخسارة وإعادة المحاولة (SDK v3)
     if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad) {
         window.CrazyGames.SDK.ad.requestAd("midgame", {
             adFinished: () => restartGame(),
@@ -118,7 +118,7 @@ if (undoBtn) {
 
 // دالة طلب إعلان المكافأة للتراجع عبر CrazyGames SDK v3
 function watchRewardedAd() {
-    if (history.length === 0) return;
+    if (history.length === 0) return; // لا يوجد تراجع متاح أصلاً
 
     if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad) {
         window.CrazyGames.SDK.ad.requestRewardedAd({
@@ -129,6 +129,7 @@ function watchRewardedAd() {
             },
             onAdError: (error) => {
                 console.log("خطأ في تشغيل الإعلان:", error);
+                // تراجع مباشر في حال حدوث خطأ برتقالي في تحميل الإعلان
                 executeUndoAction();
                 isMuted = false;
             },
@@ -137,6 +138,7 @@ function watchRewardedAd() {
             }
         });
     } else {
+        // محاكاة محلية في حال التشغيل خارج المنصة
         executeUndoAction();
     }
 }
@@ -165,6 +167,7 @@ function initGame() {
     bestScoreDisplay.textContent = bestScore;
     gameMessage.classList.remove('active');
     
+    // إعلام CrazyGames SDK ببدء جولة اللعب (SDK v3)
     if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
         window.CrazyGames.SDK.game.gameplayStart();
     }
@@ -202,6 +205,7 @@ function updateView() {
                 tile.classList.add('tile', `tile-${board[r][c]}`);
                 tile.textContent = board[r][c];
                 
+                // تصحيح إحداثيات عرض المربعات بنسب مئوية صحيحة
                 tile.style.top = `${r * 25}%`;
                 tile.style.left = `${c * 25}%`;
                 
@@ -238,6 +242,7 @@ function handleMove(direction) {
             messageText.textContent = translations[currentLang].gameOver;
             gameMessage.classList.add('active');
             
+            // إعلام المنصة بانتهاء اللعب (SDK v3)
             if (window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.game) {
                 window.CrazyGames.SDK.game.gameplayStop();
             }
