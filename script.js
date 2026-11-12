@@ -5,13 +5,19 @@ let history = [];
 let isMuted = false;
 let currentLang = localStorage.getItem('lang') || 'ar';
 
+// متغيّرات معزز التبديل (Swap Power-Up)
+let isSwapMode = false;
+let firstSelectedCell = null;
+let currentGameMode = 'standard'; // standard أو classic أو tutorial
+
 // القاموس اللغوي الشامل
 const translations = {
     ar: {
         score: "النتيجة",
         bestScore: "أعلى نتيجة",
         newGame: "لعبة جديدة",
-        undo: "تراجع",
+        undo: "تراجع (إعلان)",
+        swap: "تبديل (معزز)",
         tagline: "اجمع الارقام ووصل الى المربع 2048 !",
         gameOver: "انتهت اللعبة!",
         tryAgain: "حاول مجدداً",
@@ -21,7 +27,8 @@ const translations = {
         score: "Score",
         bestScore: "Best",
         newGame: "New Game",
-        undo: "Undo",
+        undo: "Undo (Ad)",
+        swap: "Swap (Boost)",
         tagline: "Join the numbers and get to the 2048 tile!",
         gameOver: "Game Over!",
         tryAgain: "Try Again",
@@ -85,7 +92,7 @@ function playBeep(frequency, duration) {
     } catch (e) {}
 }
 
-// ربط الأزرار
+// ربط الأزرار الأساسية
 const restartBtn = document.getElementById('restart-btn');
 if (restartBtn) {
     restartBtn.addEventListener('click', () => {
@@ -100,12 +107,37 @@ if (retryBtn) {
     });
 }
 
+// زر التراجع المرتبط بإعلانات AdMob
 const undoBtn = document.getElementById('undo-btn');
 if (undoBtn) {
     undoBtn.addEventListener('click', () => {
-        executeUndoAction();
+        onUndoButtonClicked();
     });
 }
+
+// دوال إعلانات AdMob لإرسال مكافأة التراجع
+function onUndoButtonClicked() {
+    if (typeof admob !== 'undefined' && admob.rewardedvideo) {
+        admob.rewardedvideo.config({
+            id: 'ca-app-pub-8326203252240169/2205956852',
+            isTesting: false
+        });
+        
+        admob.rewardedvideo.prepare()
+            .then(() => admob.rewardedvideo.show())
+            .catch(e => {
+                console.error('AdMob Error: ', e);
+                executeUndoAction(); // تراجع مباشر في حال فشل تحميل الإعلان
+            });
+    } else {
+        // قيد التشغيل على متصفح الكمبيوتر أو الـ Live Server
+        executeUndoAction();
+    }
+}
+
+document.addEventListener('admob.rewardedvideo.reward', () => {
+    grantUndoReward();
+}, false);
 
 function executeUndoAction() {
     if (history.length > 0) {
@@ -118,6 +150,58 @@ function executeUndoAction() {
     }
 }
 
+function grantUndoReward() {
+    executeUndoAction();
+    console.log('Undo reward granted via AdMob!');
+}
+
+// زر معزز التبديل
+const swapBtn = document.getElementById('swap-btn');
+if (swapBtn) {
+    swapBtn.addEventListener('click', () => {
+        activateSwapMode();
+    });
+}
+
+function activateSwapMode() {
+    isSwapMode = true;
+    firstSelectedCell = null;
+    if (gameMessage && messageText) {
+        messageText.textContent = currentLang === 'ar' ? 'اختر البلاطة الأولى للتبديل' : 'Select first tile to swap';
+        gameMessage.classList.add('active');
+    } else {
+        alert(currentLang === 'ar' ? 'وضع التبديل مفعل: اختر البلاطة الأولى' : 'Swap mode active: Choose first tile');
+    }
+}
+
+function handleCellClick(r, c) {
+    if (!isSwapMode) return;
+
+    if (board[r][c] === 0) {
+        alert(currentLang === 'ar' ? 'لا توجد بلاطة هنا!' : 'No tile here!');
+        return;
+    }
+
+    if (!firstSelectedCell) {
+        firstSelectedCell = { r, c };
+        if (messageText) {
+            messageText.textContent = currentLang === 'ar' ? 'اختر البلاطة الثانية للتبديل' : 'Select second tile';
+        }
+        updateView();
+    } else {
+        let temp = board[firstSelectedCell.r][firstSelectedCell.c];
+        board[firstSelectedCell.r][firstSelectedCell.c] = board[r][c];
+        board[r][c] = temp;
+
+        isSwapMode = false;
+        firstSelectedCell = null;
+        if (gameMessage) gameMessage.classList.remove('active');
+        
+        updateView();
+        playBeep(500, 0.1);
+    }
+}
+
 function initGame() {
     board = [
         [0, 0, 0, 0],
@@ -127,6 +211,8 @@ function initGame() {
     ];
     score = 0;
     history = [];
+    isSwapMode = false;
+    firstSelectedCell = null;
     if (scoreDisplay) scoreDisplay.textContent = score;
     if (bestScoreDisplay) bestScoreDisplay.textContent = bestScore;
     if (gameMessage) gameMessage.classList.remove('active');
@@ -158,6 +244,7 @@ function addNewTile() {
 function updateView() {
     if (!tileContainer) return;
     tileContainer.innerHTML = '';
+    
     for (let r = 0; r < 4; r++) {
         for (let c = 0; c < 4; c++) {
             if (board[r][c] !== 0) {
@@ -168,10 +255,26 @@ function updateView() {
                 tile.style.top = `${r * 25}%`;
                 tile.style.left = `${c * 25}%`;
                 
+                if (isSwapMode && firstSelectedCell && firstSelectedCell.r === r && firstSelectedCell.c === c) {
+                    tile.style.border = '4px solid #f1c40f';
+                    tile.style.transform = 'scale(0.92)';
+                }
+                
                 tileContainer.appendChild(tile);
             }
         }
     }
+
+    const gridRows = document.querySelectorAll('.grid-row');
+    gridRows.forEach((row, r) => {
+        const cells = row.querySelectorAll('.grid-cell');
+        cells.forEach((cell, c) => {
+            cell.onclick = () => {
+                handleCellClick(r, c);
+            };
+        });
+    });
+
     if (scoreDisplay) scoreDisplay.textContent = score;
     if (score > bestScore) {
         bestScore = score;
@@ -334,6 +437,43 @@ function checkGameOver() {
     return true;
 }
 
-// تهيئة النصوص واللعبة عند التحميل
+// تفاعلات القائمة الجانبية والأنماط
+const menuBtn = document.getElementById('menu-btn');
+const closeMenuBtn = document.getElementById('close-menu-btn');
+const sideMenu = document.getElementById('side-menu');
+const undoBtnElement = document.getElementById('undo-btn');
+const swapBtnElement = document.getElementById('swap-btn');
+
+if (menuBtn) {
+    menuBtn.addEventListener('click', () => {
+        sideMenu.classList.add('active');
+    });
+}
+
+if (closeMenuBtn) {
+    closeMenuBtn.addEventListener('click', () => {
+        sideMenu.classList.remove('active');
+    });
+}
+
+function setGameMode(mode) {
+    currentGameMode = mode;
+    sideMenu.classList.remove('active');
+
+    if (mode === 'classic') {
+        if (undoBtnElement) undoBtnElement.style.display = 'none';
+        if (swapBtnElement) swapBtnElement.style.display = 'none';
+        alert('تم التبديل إلى النمط الكلاسيكي: لا رجعة ولا معززات!');
+    } else if (mode === 'tutorial') {
+        alert('برنامج تعليمي: تعلم كيفية دمج الأرقام للوصول إلى 2048');
+    } else {
+        if (undoBtnElement) undoBtnElement.style.display = 'inline-block';
+        if (swapBtnElement) swapBtnElement.style.display = 'inline-block';
+        alert('تم التبديل إلى النمط القياسي مع معززات الطاقة!');
+    }
+    restartGame();
+}
+
+// بدء التشغيل التلقائي وتحديث النصوص
 updateTexts();
 initGame();
