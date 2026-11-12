@@ -5,28 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2048 Pro - لعبة الأرقام الاحترافية</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- تحديث إلى CrazyGames SDK v3 الرسمية -->
-    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 </head>
+<script src="cordova.js"></script>
 <body>
     <div class="game-container">
         <!-- رأس اللعبة -->
         <div class="header">
-            <h1 class="title">2048 <span class="pro-badge">PRO</span></h1>
-            <div class="scores-container">
-                <div class="score-box"><span data-i18n="score">النتيجة</span> <span id="score">0</span></div>
-                <div class="score-box"><span data-i18n="bestScore">أعلى نتيجة</span> <span id="best-score">0</span></div>
-            </div>
+            <!-- زر القائمة الجانبية (Hamburger Menu) -->
+            <button id="menu-btn" class="icon-btn">☰</button>
+            <h1 class="title">2048</h1>
+            <button id="reset-top-btn" class="icon-btn">↺</button>
         </div>
 
-        <!-- أزرار التحكم -->
+        <div class="scores-container-top">
+            <div class="score-box"><span data-i18n="score">النتيجة</span> <span id="score">0</span></div>
+            <div class="score-box"><span data-i18n="bestScore">أعلى نتيجة</span> <span id="best-score">0</span></div>
+        </div>
+
+        <!-- أزرار التحكم والمعززات -->
         <div class="controls-bar">
             <button id="restart-btn" class="btn" data-i18n="newGame">لعبة جديدة</button>
-            <!-- زر التراجع مرتبط بإعلان المكافأة -->
-            <button id="undo-btn" class="btn" data-i18n="undo">تراجع (إعلان)</button>
+            <button id="undo-btn" class="btn" onclick="onUndoButtonClicked()" data-i18n="undo">تراجع (إعلان)</button>
+            <button id="swap-btn" class="btn" onclick="activateSwapMode()">تبديل (معزز)</button>
             <button id="lang-btn" class="btn lang-toggle-btn">EN</button>
-            <div class="game-tagline" data-i18n="tagline">اجمع الارقام ووصل الى المربع 2048 !</div>
         </div>
 
         <!-- شبكة اللعب 4×4 -->
@@ -52,6 +53,62 @@
         <div class="message-container" id="game-message">
             <p id="message-text"></p>
             <button class="btn" id="retry-btn" data-i18n="tryAgain">حاول مجدداً</button>
+        </div>
+    </div>
+
+    <!-- نافذة القائمة الجانبية (Menu Modal / Drawer) المطابقة للصورة -->
+    <div id="side-menu" class="side-menu">
+        <div class="menu-content">
+            <button id="close-menu-btn" class="close-menu">✕</button>
+            
+            <div class="menu-item active-mode" onclick="setGameMode('standard')">
+                <span class="menu-icon">★</span>
+                <div>
+                    <strong>قياسي</strong>
+                    <p>2048 مع معززات الطاقة</p>
+                </div>
+            </div>
+
+            <div class="menu-item" onclick="setGameMode('classic')">
+                <span class="menu-icon">∷</span>
+                <div>
+                    <strong>كلاسيكي</strong>
+                    <p>النسخة الأصلية من عام 2048، لا رجعة فيها</p>
+                </div>
+            </div>
+
+            <div class="menu-item" onclick="setGameMode('tutorial')">
+                <span class="menu-icon">📊</span>
+                <div>
+                    <strong>برنامج تعليمي</strong>
+                    <p>تعلم كيفية لعب لعبة 2048</p>
+                </div>
+            </div>
+
+            <div class="menu-item promo-item">
+                <span class="menu-icon">👑</span>
+                <div>
+                    <strong>بالإضافة إلى</strong>
+                    <p>مكافآت إضافية ولوحة مظلمة! متوفرة حتى ديسمبر.</p>
+                </div>
+            </div>
+
+            <hr class="menu-divider">
+
+            <div class="menu-links-grid">
+                <a href="#">تقديم ملاحظات</a>
+                <a href="#">احصل على التطبيق</a>
+                <a href="#">سياسة الخصوصية</a>
+                <a href="#">إعدادات الخصوصية</a>
+                <a href="#">حول</a>
+                <a href="#">اللعبة لا تعمل؟</a>
+                <a href="#">العب سوليتير</a>
+                <a href="#">العب ألعاب الورق</a>
+            </div>
+
+            <div class="menu-footer-link">
+                → انتقل إلى 2048 القديمة
+            </div>
         </div>
     </div>
 
