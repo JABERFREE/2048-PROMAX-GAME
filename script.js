@@ -1,4 +1,3 @@
-// تهيئة CrazyGames SDK v3 بشكل آمن لتجنب الأخطاء محلياً
 window.addEventListener('DOMContentLoaded', () => {
     if (window.CrazyGames && window.CrazyGames.SDK) {
         window.CrazyGames.SDK.init().then(() => {
