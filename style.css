@@ -233,3 +233,134 @@ body {
 .tile-merged {
     animation: pop 0.2s ease-in-out;
 }
+/* أضف هذه التنسيقات في نهاية ملف style.css أو دمجها */
+.icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #b5470a;
+    cursor: pointer;
+}
+
+.scores-container-top {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+/* تنسيق القائمة الجانبية (Side Menu Modal) */
+.side-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    justify-content: flex-start;
+}
+
+.side-menu.active {
+    display: flex;
+}
+
+.menu-content {
+    width: 85%;
+    max-width: 380px;
+    height: 100%;
+    background: #fdfbf7;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.close-menu {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #555;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f4efe6;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background: #ebdccc;
+}
+
+.menu-item.active-mode {
+    background: #d8c9b4;
+    border-right: 4px solid #b5470a;
+}
+
+.menu-icon {
+    font-size: 20px;
+    color: #b5470a;
+}
+
+.menu-item strong {
+    font-size: 15px;
+    color: #333;
+    display: block;
+}
+
+.menu-item p {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+}
+
+.promo-item {
+    background: #fdf3e6;
+    border: 1px dashed #d35400;
+}
+
+.menu-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+}
+
+.menu-links-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.menu-links-grid a {
+    color: #555;
+    text-decoration: none;
+}
+
+.menu-links-grid a:hover {
+    text-decoration: underline;
+}
+
+.menu-footer-link {
+    margin-top: auto;
+    background: #e6dfd1;
+    padding: 12px;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #b5470a;
+    cursor: pointer;
+}
