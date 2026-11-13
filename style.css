@@ -5,16 +5,19 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* منع تحرك أو اهتزاز واجهة اللعبة بالكامل أثناء السحب على الموبايل */
 body, html {
     overflow: hidden;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none; /* يمنع الارتداد أو الحركة العمودية للشاشة بالكامل */
     position: fixed;
     width: 100%;
     height: 100%;
-    touch-action: none;
+    touch-action: none; /* يمنع التمرير الافتراضي ويجعل اللمس مخصصاً للعبة فقط */
 }
 
+.game-container {
+    /* ... خصائص الحاوية الخاصة بك ... */
+    touch-action: none; /* منع أي اهتزاز عند سحب المربعات عمودياً */
+}
 body {
     background: linear-gradient(135deg, #ff7e00, #ffb347);
     color: #4a2c00;
